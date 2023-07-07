@@ -10,71 +10,56 @@ metadata = MetaData(naming_convention={
 
 db = SQLAlchemy(metadata=metadata)
 
-class Hotel(db.Model, SerializerMixin):
-    __tablename__ = 'hotels'
+class Category(db.Model, SerializerMixin):
+    __tablename__ = 'categories'
 
-    serialize_rules = ('-reviews',)
+    id = db.Column(db.Integer, primary_key = True)
+    category = db.Column(db.String, unique = True, nullable = False)
+    # title = db.Column(db.String, unique = True, nullable = False)
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
-    image = db.Column(db.String, nullable=False)
+    category_recipes = db.relationship('Category_recipe', backref = 'cateogry')
 
-    reviews = db.relationship('Review', back_populates='hotel')
+    serialize_rules = ('-category_recipes',)
 
-    customers = association_proxy('reviews', 'customer',
-        creator=lambda c: Review(customer=c))
+class Category_recipe(db.Model, SerializerMixin):
+    __tablename__ = 'category_recipes'
 
-    @validates('name')
-    def validate_name(self, key, value):
-        if len(value) < 5:
-            raise ValueError(f"{key} must be at least 5 characters long.")
-        return value
-    
-    def __repr__(self):
-        return f"Hotel # {self.id}: {self.name} hotel"
+    id = db.Column(db.Integer, primary_key = True)
 
-class Customer(db.Model, SerializerMixin):
-    __tablename__ = 'customers'
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), nullable = False)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable = False)
 
-    serialize_rules = ('-reviews',)
+    serialize_rules = ('-categories', 'recipes',)
 
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String, nullable=False)
-    last_name = db.Column(db.String, nullable=False)
+class Recipe(db.Model, SerializerMixin):
+    __tablename__ = 'recipes'
 
-    reviews = db.relationship('Review', back_populates='customer')
+    id = db.Column(db.Integer, primary_key = True)
 
-    hotels = association_proxy('reviews', 'hotel',
-        creator=lambda h: Review(hotel=h))
+    title = db.Column(db.String, unique = True, nullable = False)
+    picture = db.Column(db.String, unique = True)
+    ingredients = db.Column(db.String, unique = True, nullable = False)
+    preparation = db.Column(db.String, unique = True, nullable = False)
+    tips = db.Column(db.String, unique = True)
+    reviews = db.Column(db.String, unique = True)
 
-    __table_args__ = (
-        db.CheckConstraint('(first_name != last_name)'),
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
 
-    @validates('first_name', 'last_name')
-    def validate_first_name(self, key, value):
-        if value is None:
-            raise ValueError(f"{key} cannot be null.")
-        elif len(value) < 4:
-            raise ValueError(f"{key} must be at least 4 characters long.")
-        return value
-    
-    def __repr__(self):
-        return f"Customer # {self.id}: {self.first_name} {self.last_name}"
-    
-class Review(db.Model, SerializerMixin):
-    __tablename__ = 'reviews'
+    category_recipes = db.relationship('Category_recipe', backref = 'recipe')
 
-    serialize_rules = ('-hotel.reviews', '-customer.reviews')
+    serialize_rules = ('-users', 'category_recipes',)
 
-    id = db.Column(db.Integer, primary_key=True)
-    rating = db.Column(db.Integer)
 
-    hotel_id = db.Column(db.Integer, db.ForeignKey('hotels.id'))
-    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'))
+class User(db.Model, SerializerMixin):
+    __tablename__ = 'users'
 
-    hotel = db.relationship('Hotel', back_populates='reviews')
-    customer = db.relationship('Customer', back_populates='reviews')
+    id = db.Column(db.Integer, primary_key = True)
+    username = db.Column(db.String, unique = True, nullable = False)
+    password = db.Column(db.String, unique = True, nullable = False)
+    reviews = db.Column(db.String, unique = True)
 
-    def __repr__(self):
-        return f"Review # {self.id}: {self.customer.first_name} {self.customer.last_name} left of a review for {self.hotel.name} with a rating of {self.rating}."
+    recipes = db.relationship('Recipe', backref = 'User')
+
+    serialze_rules = ('-recipes',)
+
+# Models go here!

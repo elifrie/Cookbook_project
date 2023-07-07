@@ -8,7 +8,7 @@ from flask_migrate import Migrate
 from flask_restful import Api, Resource
 from flask_cors import CORS
 
-from models import db, Hotel, Customer, Review
+from models import db, Recipe, User, Category_recipe, Category
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hotels.db'
@@ -23,25 +23,25 @@ db.init_app(app)
 
 api = Api(app)
 
-class Hotels(Resource):
+class User(Resource):
 
     def get(self):
-        hotels = Hotel.query.all()
+        users = User.query.all()
 
         response_body = []
 
-        for hotel in hotels:
-            response_body.append(hotel.to_dict())
+        for user in users:
+            response_body.append(user.to_dict())
 
         return make_response(jsonify(response_body), 200)
 
     def post(self):
         try:
-            new_hotel = Hotel(name=request.get_json().get('name'), image=request.get_json().get('image'))
-            db.session.add(new_hotel)
+            new_user = User(username=request.get_json().get('username'), password=request.get_json().get('password'))
+            db.session.add(new_user)
             db.session.commit()
 
-            response_body = new_hotel.to_dict()
+            response_body = new_user.to_dict()
             
             return make_response(jsonify(response_body), 201)
         except ValueError as error:
@@ -51,254 +51,74 @@ class Hotels(Resource):
             return make_response(jsonify(response_body), 422)
 
 
-api.add_resource(Hotels, '/hotels')
+api.add_resource(User, '/users')
 
-class HotelById(Resource):
-
-    def get(self, id):
-        hotel = Hotel.query.filter(Hotel.id == id).first()
-
-        if not hotel:
-            response_body = {
-                "error": "Hotel not found"
-            }
-            status = 404
-
-        else:
-            response_body = hotel.to_dict()
-            customer_list = []
-            for customer in list(set(hotel.customers)):
-                customer_list.append({
-                    "id": customer.id,
-                    "first_name": customer.first_name,
-                    "last_name": customer.last_name
-                })
-            response_body.update({"customers": customer_list})
-            status = 200
-
-        return make_response(jsonify(response_body), status)
-    
-    def patch(self, id):
-        hotel = Hotel.query.filter(Hotel.id == id).first()
-
-        if not hotel:
-            response_body = {
-                "error": "Hotel not found"
-            }
-            return make_response(jsonify(response_body), 404)
-
-        else:
-            try:
-                json_data = request.get_json()
-                for key in json_data:
-                    setattr(hotel, key, json_data.get(key))
-                db.session.commit()
-
-                response_body = hotel.to_dict()
-                return make_response(jsonify(response_body), 200)
-            
-            except ValueError as error:
-                
-                response_body = {
-                    "error": error.args
-                }
-                
-                return make_response(jsonify(response_body), 422)
-    
-    def delete(self, id):
-        hotel = Hotel.query.filter(Hotel.id == id).first()
-
-        if not hotel:
-            response_body = {
-                "error": "Hotel not found"
-            }
-            status = 404
-
-        else:
-            db.session.delete(hotel)
-            db.session.commit()
-
-            response_body = {}
-            status = 204
-
-        return make_response(jsonify(response_body), status)
-
-
-api.add_resource(HotelById, '/hotels/<int:id>')
-
-class Customers(Resource):
+class Recipe(Resource):
 
     def get(self):
-        customers = Customer.query.all()
-
-        response_body = []
-        for customer in customers:
-            response_body.append(customer.to_dict())
-        
+        recipes = Recipe.query.all()
+        response_body = [recipe.to_dict() for recipe in recipes]
         return make_response(jsonify(response_body), 200)
     
     def post(self):
-        try:
-            new_customer = Customer(first_name=request.get_json().get('first_name'), last_name=request.get_json().get('last_name'))
-
-            db.session.add(new_customer)
-            db.session.commit()
-            
-            return make_response(jsonify(new_customer.to_dict()), 201)
-        except ValueError as error:
-            response_body = {
-                "error": error.args
-            }
-            return make_response(jsonify(response_body), 422)
-
-api.add_resource(Customers, '/customers')
-
-class CustomerById(Resource):
-
-    def get(self, id):
-        customer = Customer.query.filter(Customer.id == id).first()
-
-        if not customer:
-            response_body = {
-                "error": "Customer not found"
-            }
-            status = 404
-        else:
-            response_body = customer.to_dict()
-            status = 200
-
-        return make_response(jsonify(response_body), status)
-    
-    def patch(self, id):
-        customer = Customer.query.filter(Customer.id == id).first()
-
-        if not customer:
-            response_body = {
-                "error": "Customer not found"
-            }
-            return make_response(jsonify(response_body), 404)
-        else:
-            try:
-                json_data = request.get_json()
-                
-                for key in json_data:
-                    setattr(customer, key, json_data.get(key))
-
-                db.session.commit()
-
-                response_body = customer.to_dict()
-
-                return make_response(jsonify(response_body), 200)
-            except ValueError as error:
-                response_body = {
-                    "error": error.args
-                }
-                return make_response(jsonify(response_body), 422)
-    
-    def delete(self, id):
-        customer = Customer.query.filter(Customer.id == id).first()
-        
-        if not customer:
-
-            response_body = {
-                "error": "Customer not found"
-            }
-            status = 404
-        
-        else:
-            
-            db.session.delete(customer)
-            db.session.commit()
-
-            response_body = {}
-            status = 204
-
-        return make_response(jsonify(response_body), status)
-
-api.add_resource(CustomerById, '/customers/<int:id>')
-
-class Reviews(Resource):
-
-    def get(self):
-        reviews = Review.query.all()
-
-        response_body = []
-
-        for review in reviews:
-            response_body.append(review.to_dict())
-
-        return make_response(jsonify(response_body), 200)
-    
-    def post(self):
-        json_data = request.get_json()
-        new_review = Review(hotel_id=json_data.get('hotel_id'), customer_id=json_data.get('customer_id'), rating=json_data.get('rating'))
-        db.session.add(new_review)
-        db.session.commit()
-
-        response_body = new_review.to_dict()
-        
+        data = request.get_json()
+        new_recipe = Recipe(
+            title = data['title'],
+            picture = data['picture'],
+            ingredients = data['ingredients'],
+            preparation = data['preparation'],
+            tips = data['tips'],
+            reviews = data['reviews']
+        )
+        db.session.add(new_recipe)
+        db.session.commmit()
+        response_body = new_recipe.to_dict()
         return make_response(jsonify(response_body), 201)
     
-api.add_resource(Reviews, '/reviews')
+api.add_resource(Recipe, '/recipes')
 
-class ReviewById(Resource):
-
-    def get(self, id):
-        review = Review.query.filter(Review.id == id).first()
-
-        if not review:
-            response_body = {
-                "error": "Review not found"
-            }
-            status = 404
-        else:
-            response_body = review.to_dict()
-            status = 200
-
-        return make_response(jsonify(response_body), status)
+class RecipeById(Resource):
+    def get(self,id):
+        recipe = Recipe.query.filter_by(id = id).first()
+        response_body = recipe.to_dict()
+        return make_response(jsonify(response_body), 200)
     
     def patch(self, id):
-        review = Review.query.filter(Review.id == id).first()
-
-        if not review:
-            response_body = {
-                "error": "Review not found"
-            }
-            status = 404
-        else:
-            json_data = request.get_json()
-
-            for key in json_data:
-                setattr(review, key, json_data.get(key))
-
-            db.session.commit()
-
-            response_body = review.to_dict()
-            status = 200
-
-        return make_response(jsonify(response_body), status)
+        recipe = Recipe.query.filter_by(id = id).first()
+        data = request.get_json()
+        for attr in data:
+            setattr(recipe, data[attr])
+        db.session.commit()
+        response_body = recipe.to_dict()
+        return make_response(jsonify(response_body), 202)
     
     def delete(self, id):
-        review = Review.query.filter(Review.id == id).first()
-        
-        if not review:
+        recipe = Recipe.query.filter_by(id = id).first()
+        db.session.delete(recipe)
+        return make_response(jsonify({'message': 'Recipe deleted!'}), 204)
 
-            response_body = {
-                "error": "Review not found"
-            }
-            status = 404
-        
-        else:
-            
-            db.session.delete(review)
-            db.session.commit()
+api.add_resource(RecipeById, '/recipes/<int:id>')
 
-            response_body = {}
-            status = 204
+class Category(Resource):
+    def get(self):
+        category = Category.query.all()
+        response_body = category.to_dict()
+        return make_response(jsonify(response_body), 200)
 
-        return make_response(jsonify(response_body), status)
+api.add_resource(Category, '/category')
 
-api.add_resource(ReviewById, '/reviews/<int:id>')
+class CategoryById(Resource):
+    def get(self, id):
+        category = Category.query.filter_by(id = id).first()
+        response_body = category.to_dict()
+        return make_response(jsonify(response_body), 200)
+    
+api.add_resource(CategoryById, '/category/<int:id>')
 
-if __name__ == '__main__':
-    app.run(port=7000, debug=True)
+class Category_recipe(Resource):
+    def get(self):
+        category_recipe = Category_recipe.query.all()
+        response_body = category_recipe.to_dict()
+        return make_response(jsonify(response_body), 200)
+    
+api.add_resource(Category_recipe, '/category_recipe')
