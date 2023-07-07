@@ -2,12 +2,13 @@
 
 import ipdb
 
-from flask import Flask, make_response, jsonify, request
+from flask import Flask, make_response, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
 from flask_cors import CORS
-
+from flask_bcrypt import Bcrypt
+from datetime import datetime
 from models import db, Recipe, User, Category_recipe, Category
 
 app = Flask(__name__)
@@ -23,17 +24,14 @@ db.init_app(app)
 
 api = Api(app)
 
-class User(Resource):
+class Users(Resource):
 
     def get(self):
         users = User.query.all()
-
         response_body = []
-
         for user in users:
             response_body.append(user.to_dict())
-
-        return make_response(jsonify(response_body), 200)
+        return make_response(response_body,200)
 
     def post(self):
         try:
@@ -51,9 +49,9 @@ class User(Resource):
             return make_response(jsonify(response_body), 422)
 
 
-api.add_resource(User, '/users')
+api.add_resource(Users, '/users')
 
-class Recipe(Resource):
+class Recipes(Resource):
 
     def get(self):
         recipes = Recipe.query.all()
@@ -63,6 +61,7 @@ class Recipe(Resource):
     def post(self):
         data = request.get_json()
         new_recipe = Recipe(
+            user_id = data['user_id'],
             title = data['title'],
             picture = data['picture'],
             ingredients = data['ingredients'],
@@ -71,11 +70,11 @@ class Recipe(Resource):
             reviews = data['reviews']
         )
         db.session.add(new_recipe)
-        db.session.commmit()
+        db.session.commit()
         response_body = new_recipe.to_dict()
         return make_response(jsonify(response_body), 201)
     
-api.add_resource(Recipe, '/recipes')
+api.add_resource(Recipes, '/recipes')
 
 class RecipeById(Resource):
     def get(self,id):
@@ -87,7 +86,7 @@ class RecipeById(Resource):
         recipe = Recipe.query.filter_by(id = id).first()
         data = request.get_json()
         for attr in data:
-            setattr(recipe, data[attr])
+            setattr(recipe, attr, data[attr])
         db.session.commit()
         response_body = recipe.to_dict()
         return make_response(jsonify(response_body), 202)
@@ -95,17 +94,18 @@ class RecipeById(Resource):
     def delete(self, id):
         recipe = Recipe.query.filter_by(id = id).first()
         db.session.delete(recipe)
+        db.session.commit()
         return make_response(jsonify({'message': 'Recipe deleted!'}), 204)
 
 api.add_resource(RecipeById, '/recipes/<int:id>')
 
-class Category(Resource):
+class Categories(Resource):
     def get(self):
-        category = Category.query.all()
-        response_body = category.to_dict()
+        categories = Category.query.all()
+        response_body = [category.to_dict() for category in categories]
         return make_response(jsonify(response_body), 200)
 
-api.add_resource(Category, '/category')
+api.add_resource(Categories, '/categories')
 
 class CategoryById(Resource):
     def get(self, id):
@@ -113,12 +113,15 @@ class CategoryById(Resource):
         response_body = category.to_dict()
         return make_response(jsonify(response_body), 200)
     
-api.add_resource(CategoryById, '/category/<int:id>')
+api.add_resource(CategoryById, '/categories/<int:id>')
 
-class Category_recipe(Resource):
+class RecipesByCategory(Resource):
     def get(self):
-        category_recipe = Category_recipe.query.all()
-        response_body = category_recipe.to_dict()
+        category_recipes = Category_recipe.query.all()
+        response_body = [category_recipe.to_dict() for category_recipe in category_recipes]
         return make_response(jsonify(response_body), 200)
     
-api.add_resource(Category_recipe, '/category_recipe')
+api.add_resource(RecipesByCategory, '/recipesbycategory')
+
+if __name__ == '__main__':
+    app.run(port=7555, debug=True)

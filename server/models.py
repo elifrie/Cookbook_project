@@ -17,7 +17,7 @@ class Category(db.Model, SerializerMixin):
     category = db.Column(db.String, unique = True, nullable = False)
     # title = db.Column(db.String, unique = True, nullable = False)
 
-    category_recipes = db.relationship('Category_recipe', backref = 'cateogry')
+    category_recipes = db.relationship('Category_recipe', backref = 'category')
 
     serialize_rules = ('-category_recipes',)
 
@@ -29,25 +29,25 @@ class Category_recipe(db.Model, SerializerMixin):
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), nullable = False)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable = False)
 
-    serialize_rules = ('-categories', 'recipes',)
+    serialize_rules = ('-categories', '-recipes',)
 
 class Recipe(db.Model, SerializerMixin):
     __tablename__ = 'recipes'
 
     id = db.Column(db.Integer, primary_key = True)
 
-    title = db.Column(db.String, unique = True, nullable = False)
-    picture = db.Column(db.String, unique = True)
-    ingredients = db.Column(db.String, unique = True, nullable = False)
-    preparation = db.Column(db.String, unique = True, nullable = False)
-    tips = db.Column(db.String, unique = True)
-    reviews = db.Column(db.String, unique = True)
+    title = db.Column(db.String, nullable = False)
+    picture = db.Column(db.String)
+    ingredients = db.Column(db.String)
+    preparation = db.Column(db.String)
+    tips = db.Column(db.String)
+    reviews = db.Column(db.String)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     category_recipes = db.relationship('Category_recipe', backref = 'recipe')
 
-    serialize_rules = ('-users', 'category_recipes',)
+    serialize_rules = ('-users', '-category_recipes',)
 
 
 class User(db.Model, SerializerMixin):
@@ -58,8 +58,8 @@ class User(db.Model, SerializerMixin):
     password = db.Column(db.String, unique = True, nullable = False)
     reviews = db.Column(db.String, unique = True)
 
-    recipes = db.relationship('Recipe', backref = 'User')
+    recipes = db.relationship('Recipe', backref = 'user')
 
-    serialze_rules = ('-recipes',)
+    serialize_rules = ('-recipes',)
 
 # Models go here!
