@@ -2,9 +2,8 @@ function Header(){
     return (
         <header>
             <h1>
-            Hotels Website
+            Daphna & Chuchu's Family Cookbook
             <span className="logo" role="img">
-                🏨
             </span>
             </h1>
         </header>

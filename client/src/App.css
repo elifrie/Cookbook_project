@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family: "Helvetica", sans-serif;
 }
 
 .App-logo {
@@ -12,6 +13,99 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+
+.update-recipe{
+  margin-bottom: 50px;
+}
+
+.recipe-update-form {
+  display: flex;
+  flex-wrap: wrap;
+  margin: auto;
+  display: grid;
+  grid-template-rows: repeat(auto-fill, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 30px;
+  max-width: 1170px;
+}
+
+.add-recipe {
+  margin-bottom: 50px;
+}
+
+.recipe-add-form {
+  display: flex;
+  flex-wrap: wrap;
+  margin: auto;
+  display: grid;
+  grid-template-rows: repeat(auto-fill, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 30px;
+  max-width: 1170px;
+}
+
+.title_new_recipe {
+  margin-bottom: 10px;
+}
+
+.category_new_recipe {
+  width: 1170px;
+  padding-top: 5px;
+  margin-bottom: 10px;
+  text-indent: 5px;
+}
+
+.ingredients_new_recipe {
+  width: 1170px;
+  height: 250px;
+  margin-bottom: 10px;
+  text-indent: 10px;
+  padding-top: 5px;
+}
+
+.preparation_new_recipe {
+  width: 1170px;
+  height: 250px;
+  margin-bottom: 10px;
+  text-indent: 10px;
+  padding-top: 5px;
+}
+
+.tips_new_recipe {
+  width: 1170px;
+  height: 250px;
+  margin-bottom: 10px;
+  text-indent: 10px;
+  padding-top: 5px;
+}
+
+.category-container {
+  float: left;
+  margin: auto;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.category {
+  width: 200px;
+  height: 200px;
+  margin: 10px;
+  padding: 20px;
+  text-align: center;
+  color: black;
+  font-family: "Helvetica", sans-serif;
+  font-weight: bold;
+  font-size: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 
 .App-header {
   background-color: #282c34;

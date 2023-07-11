@@ -13,7 +13,28 @@ with app.app_context():
 
     #List of categories
     category_data = [
-        {"category": "Appetizers"}
+        {"category": "Appetizers"},
+        {"category": "Breads & Savory Pastries"},
+        {"category": "Cakes & Sweet Pastries"},
+        {"category": "Chicken"},
+        {"category": "Cookies"},
+        {"category": "Desserts (non pastries)"},
+        {"category": "Drinks"},
+        {"category": "Eggs"},
+        {"category": "Fish & Seafood"},
+        {"category": "Ground Meats"},
+        {"category": "Hannukah"},
+        {"category": "Jams, Marmalade, Granola, & more"},
+        {"category": "Meat"},
+        {"category": "Passover"},
+        {"category": "Pasta"},
+        {"category": "Potatoes"},
+        {"category": "Rice"},
+        {"category": "Rosh Hashanah"},
+        {"category": "Sauces, Spreads, & Pastes"},
+        {"category": "Soups"},
+        {"category": "Sourdough Breads"},
+        {"category": "Veggies & Salads"}
     ]
 
     def seed_categories():

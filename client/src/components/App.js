@@ -4,33 +4,68 @@ import { Route, Switch } from "react-router-dom"
 
 import NavBar from './NavBar'
 import Header from './Header'
-import HotelList from './HotelList'
-import NewHotelForm from './NewHotelForm'
-import UpdateHotelForm from './UpdateHotelForm'
+import RecipeList from './RecipeList'
+import NewRecipeForm from './NewRecipeForm'
+import UpdateRecipeForm from './UpdateRecipeForm'
+import About from './About'
+import CategoryCard from './CategoryCard.js'
+import CategoryList from './CategoryList'
+import Search from './Search'
 
 function App() {
 
-  const [hotels, setHotels] = useState([])
+  const [recipes, setRecipes] = useState([])
+  const [categories, setCategories] = useState([])
   const [postFormData, setPostFormData] = useState({})
   const [idToUpdate, setIdToUpdate] = useState(0)
   const [patchFormData, setPatchFormData] = useState({})
+  const [searchRecipe, setRecipeSearch] = useState('')
+  const [searchCategory, setCategorySearch] = useState('')
+
+function searchByRecipe(e) {
+  setRecipeSearch(e.target.value)
+}
+
+const filterRecipe = recipes.filter(recipe => {
+  if (searchRecipe === '') {
+    return true
+  }
+  return recipe.title.toLowerCase().includes(searchRecipe.toLowerCase())
+})
+
+// function searchByCategory(e) {
+//   setCategorySearch(e.target.value)
+// }
+
+// const filterCategory = categories.filter(category => {
+//   if (searchCategory === '') {
+//     return true
+//   }
+//   return category.category.toLowerCase().includes(searchCategory.toLowerCase())
+// })
 
   useEffect(() => {
-    fetch('/hotels')
+    fetch('http://localhost:7555/recipes')
     .then(response => response.json())
-    .then(hotelData => setHotels(hotelData))
+    .then(recipeData => setRecipes(recipeData))
   }, [])
 
   useEffect(() => {
-    if(hotels.length > 0 && hotels[0].id){
-      setIdToUpdate(hotels[0].id)
-    }
-  }, [hotels])
+    fetch('http://localhost:7555/categories')
+    .then(response => response.json())
+    .then(categoryData => setCategories(categoryData))
+  }, [])
 
-  function addHotel(event){
+  // useEffect(() => {
+  //   if(hotels.length > 0 && hotels[0].id){
+  //     setIdToUpdate(hotels[0].id)
+  //   }
+  // }, [hotels])
+
+  function addRecipe(event){
     event.preventDefault()
 
-    fetch('/hotels', {
+    fetch('/recipes', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,12 +74,12 @@ function App() {
       body: JSON.stringify(postFormData)
     })
     .then(response => response.json())
-    .then(newHotel => setHotels(hotels => [...hotels, newHotel]))
+    .then(newRecipe => setRecipes(recipes => [...recipes, newRecipe]))
   }
 
-  function updateHotel(event){
+  function updateRecipe(event){
     event.preventDefault()
-    fetch(`/hotels/${idToUpdate}`, {
+    fetch(`/recipes/${idToUpdate}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -53,30 +88,30 @@ function App() {
       body: JSON.stringify(patchFormData)
     })
     .then(response => response.json())
-    .then(updatedHotel => {
-      setHotels(hotels => {
-        return hotels.map(hotel => {
-          if(hotel.id === updatedHotel.id){
-            return updatedHotel
+    .then(updatedRecipe => {
+      setRecipes(recipes => {
+        return recipes.map(recipe => {
+          if(recipe.id === updatedRecipe.id){
+            return updatedRecipe
           }
           else{
-            return hotel
+            return recipe
           }
         })
       })
     })
   }
 
-  function deleteHotel(id){
-    fetch(`/hotels/${id}`, {
-      method: "DELETE"
-    })
-    .then(() => setHotels(hotels => {
-      return hotels.filter(hotel => {
-        return hotel.id !== id
-      })
-    }))
-  }
+  // function deleteHotel(id){
+  //   fetch(`/hotels/${id}`, {
+  //     method: "DELETE"
+  //   })
+  //   .then(() => setHotels(hotels => {
+  //     return hotels.filter(hotel => {
+  //       return hotel.id !== id
+  //     })
+  //   }))
+  // }
 
   function updatePostFormData(event){
     setPostFormData({...postFormData, [event.target.name]: event.target.value})
@@ -92,14 +127,20 @@ function App() {
       <Header />
       <Switch>
         <Route exact path="/">
-          <h1>Welcome! Here is the list of hotels available:</h1>
-          <HotelList hotels={hotels} deleteHotel={deleteHotel}/>
+          <About />
         </Route>
-        <Route path="/add_hotel">
-          <NewHotelForm addHotel={addHotel} updatePostFormData={updatePostFormData}/>
+        <Route exact path = "/recipesbycategory">
+          <CategoryList categories = {categories} />
+          {/* <RecipeList recipes={recipes} /> */}
         </Route>
-        <Route path="/update_hotel">
-          <UpdateHotelForm updateHotel={updateHotel} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} hotels={hotels}/>
+        <Route exact path = "/search">
+          <Search searchByRecipe = {searchByRecipe} searchRecipe = {searchRecipe}/> 
+        </Route>
+        <Route path="/add_recipe">
+          <NewRecipeForm addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories}/>
+        </Route>
+        <Route path="/update_recipe">
+          <UpdateRecipeForm updateRecipe={updateRecipe} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} recipes={filterRecipe} categories = {categories}/>
         </Route>
       </Switch>
     </div>
