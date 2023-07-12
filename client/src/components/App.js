@@ -45,13 +45,13 @@ const filterRecipe = recipes.filter(recipe => {
 // })
 
   useEffect(() => {
-    fetch('http://localhost:7555/recipes')
+    fetch('/recipes')
     .then(response => response.json())
     .then(recipeData => setRecipes(recipeData))
   }, [])
 
   useEffect(() => {
-    fetch('http://localhost:7555/categories')
+    fetch('/categories')
     .then(response => response.json())
     .then(categoryData => setCategories(categoryData))
   }, [])
@@ -74,7 +74,14 @@ const filterRecipe = recipes.filter(recipe => {
       body: JSON.stringify(postFormData)
     })
     .then(response => response.json())
-    .then(newRecipe => setRecipes(recipes => [...recipes, newRecipe]))
+    .then(newRecipe => {
+      console.log(newRecipe)
+        setRecipes(recipes => [...recipes, newRecipe])
+      })
+  }
+
+  function updatePostFormData(event){
+    setPostFormData({...postFormData, [event.target.name]: event.target.value})
   }
 
   function updateRecipe(event){
@@ -113,9 +120,6 @@ const filterRecipe = recipes.filter(recipe => {
   //   }))
   // }
 
-  function updatePostFormData(event){
-    setPostFormData({...postFormData, [event.target.name]: event.target.value})
-  }
 
   function updatePatchFormData(event){
     setPatchFormData({...patchFormData, [event.target.name]: event.target.value})
@@ -137,7 +141,7 @@ const filterRecipe = recipes.filter(recipe => {
           <Search searchByRecipe = {searchByRecipe} searchRecipe = {searchRecipe}/> 
         </Route>
         <Route path="/add_recipe">
-          <NewRecipeForm addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories}/>
+          <NewRecipeForm addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories} searchByRecipe = {searchByRecipe}/>
         </Route>
         <Route path="/update_recipe">
           <UpdateRecipeForm updateRecipe={updateRecipe} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} recipes={filterRecipe} categories = {categories}/>

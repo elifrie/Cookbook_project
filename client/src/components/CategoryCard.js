@@ -1,12 +1,12 @@
 function CategoryCard({category}) {
 
     function handleClick() {
-
+        console.log('clicked')
     }
 
     return (
         <div className = 'category-container'>
-            <div className = 'category'>
+            <div className = 'category' onClick = {handleClick}>
             {category.category}
             </div>
         </div>

@@ -20,7 +20,7 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
-CORS(app)
+# CORS(app)
 
 api = Api(app)
 
@@ -61,13 +61,13 @@ class Recipes(Resource):
     def post(self):
         data = request.get_json()
         new_recipe = Recipe(
-            user_id = data['user_id'],
+            user_id = 1,
             title = data['title'],
-            picture = data['picture'],
+            # picture = data['picture'],
             ingredients = data['ingredients'],
             preparation = data['preparation'],
-            tips = data['tips'],
-            reviews = data['reviews']
+            tips = data['tips']
+            # reviews = data['reviews']
         )
         db.session.add(new_recipe)
         db.session.commit()
@@ -120,6 +120,19 @@ class RecipesByCategory(Resource):
         category_recipes = Category_recipe.query.all()
         response_body = [category_recipe.to_dict() for category_recipe in category_recipes]
         return make_response(jsonify(response_body), 200)
+
+    def post(self):
+        recipe = Recipe.query.filter_by(id = request.json.get('recipe_id')).first()
+        category = Category.query.filter_by(id = request.json.get('category_id')).first()
+        
+        new_recipe_category = Category_recipe(
+            recipe_id = recipe.id,
+            category_id = category.id
+        )
+        db.session.add(new_recipe_category)
+        db.session.commit()
+        response_body = new_recipe_category.to_dict()
+        return make_response(jsonify(response_body), 201)
     
 api.add_resource(RecipesByCategory, '/recipesbycategory')
 
