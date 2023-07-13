@@ -17,6 +17,7 @@ function App() {
   const [recipes, setRecipes] = useState([])
   const [categories, setCategories] = useState([])
   const [postFormData, setPostFormData] = useState({})
+  const [postCategoryFormData, setPostCategoryFormData] = useState({})
   const [idToUpdate, setIdToUpdate] = useState(0)
   const [patchFormData, setPatchFormData] = useState({})
   const [searchRecipe, setRecipeSearch] = useState('')
@@ -75,13 +76,34 @@ const filterRecipe = recipes.filter(recipe => {
     })
     .then(response => response.json())
     .then(newRecipe => {
-      console.log(newRecipe)
         setRecipes(recipes => [...recipes, newRecipe])
       })
   }
 
   function updatePostFormData(event){
     setPostFormData({...postFormData, [event.target.name]: event.target.value})
+  }
+
+  function addCategoryRecipe(event){
+    event.preventDefault()
+
+    fetch('/recipesbycategory', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(postCategoryFormData)
+    })
+    .then(response => response.json())
+    .then(newCategoryRecipe => {
+      console.log(newCategoryRecipe)
+        setRecipes(categories => [...categories, newCategoryRecipe])
+      })
+  }
+
+  function updatePostCategoryFormData(event){
+    setPostCategoryFormData({...postCategoryFormData, [event.target.name]: event.target.value})
   }
 
   function updateRecipe(event){
@@ -139,9 +161,10 @@ const filterRecipe = recipes.filter(recipe => {
         </Route>
         <Route exact path = "/search">
           <Search searchByRecipe = {searchByRecipe} searchRecipe = {searchRecipe}/> 
+          <RecipeList recipes = {filterRecipe}/>
         </Route>
         <Route path="/add_recipe">
-          <NewRecipeForm addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories} searchByRecipe = {searchByRecipe}/>
+          <NewRecipeForm addCategoryRecipe ={addCategoryRecipe} updatePostCategoryFormData={updatePostCategoryFormData} addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories} searchByRecipe = {searchByRecipe}/>
         </Route>
         <Route path="/update_recipe">
           <UpdateRecipeForm updateRecipe={updateRecipe} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} recipes={filterRecipe} categories = {categories}/>

@@ -122,11 +122,11 @@ class RecipesByCategory(Resource):
         return make_response(jsonify(response_body), 200)
 
     def post(self):
-        recipe = Recipe.query.filter_by(id = request.json.get('recipe_id')).first()
+        # recipe = Recipe.query.filter_by(id = request.json.get('recipe_id')).first()
         category = Category.query.filter_by(id = request.json.get('category_id')).first()
         
         new_recipe_category = Category_recipe(
-            recipe_id = recipe.id,
+            # recipe_id = recipe.id,
             category_id = category.id
         )
         db.session.add(new_recipe_category)

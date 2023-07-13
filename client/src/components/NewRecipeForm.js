@@ -1,6 +1,6 @@
 import {useState} from 'react'
 
-function NewRecipeForm({addRecipe, updatePostFormData, categories}){
+function NewRecipeForm({addRecipe, updatePostFormData, categories, addCategoryRecipe, updatePostCategoryFormData}){
 
     const [formSubmitted, setFormSubmitted] = useState(false)
 
@@ -10,11 +10,12 @@ function NewRecipeForm({addRecipe, updatePostFormData, categories}){
             {formSubmitted ? <h1>Thanks for adding a new recipe!</h1> :
             <form onSubmit={event => {
                     addRecipe(event)
+                    addCategoryRecipe(event)
                 setFormSubmitted(formSubmitted => !formSubmitted)
             }}>
                 <div className= 'recipe-form-container'>
                     <input onChange={updatePostFormData} type="text" className = "title_new_recipe" name="title" placeholder="Recipe name" required/>
-                    <select onChange={updatePostFormData} type="text" className = "category_new_recipe" name="category" placeholder="Category" required>
+                    <select onChange={updatePostCategoryFormData} type="text" className = "category_new_recipe" name="category" placeholder="Category" required>
                         {categories.map(category => {
                             return <option key = {category.id} value = {category.id}>{category.category}</option>
                         })}
