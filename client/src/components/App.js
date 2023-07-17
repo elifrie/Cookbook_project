@@ -23,13 +23,15 @@ function App() {
   const [searchRecipe, setRecipeSearch] = useState('')
   const [searchCategory, setCategorySearch] = useState('')
 
+  console.log(patchFormData)
+
 function searchByRecipe(e) {
   setRecipeSearch(e.target.value)
 }
 
 const filterRecipe = recipes.filter(recipe => {
   if (searchRecipe === '') {
-    return true
+    return false
   }
   return recipe.title.toLowerCase().includes(searchRecipe.toLowerCase())
 })
@@ -48,13 +50,28 @@ const filterRecipe = recipes.filter(recipe => {
   useEffect(() => {
     fetch('/recipes')
     .then(response => response.json())
-    .then(recipeData => setRecipes(recipeData))
+    .then(recipeData => {
+      setRecipes(recipeData)
+      if (recipeData.length > 0) {
+        setPatchFormData(patchFormData => {
+          return {...patchFormData, id: recipeData[0].id}
+        })
+      }
+    })
   }, [])
 
   useEffect(() => {
     fetch('/categories')
     .then(response => response.json())
-    .then(categoryData => setCategories(categoryData))
+    .then(categoryData => {
+      setCategories(categoryData)
+      if (categoryData.length > 0) {
+        setPatchFormData(patchFormData => {
+          return {...patchFormData, category: categoryData[0].category}
+        })
+      }
+    }
+      )
   }, [])
 
   // useEffect(() => {
@@ -81,34 +98,38 @@ const filterRecipe = recipes.filter(recipe => {
   }
 
   function updatePostFormData(event){
-    setPostFormData({...postFormData, [event.target.name]: event.target.value})
+    
+    if (event.target.name === 'category') {
+      setPostFormData({...postFormData, [event.target.name]: event.target.value})
+    }
+    else {setPostFormData({...postFormData, [event.target.name]: event.target.value})}
   }
 
-  function addCategoryRecipe(event){
-    event.preventDefault()
+  // function addCategoryRecipe(event){
+  //   event.preventDefault()
 
-    fetch('/recipesbycategory', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify(postCategoryFormData)
-    })
-    .then(response => response.json())
-    .then(newCategoryRecipe => {
-      console.log(newCategoryRecipe)
-        setRecipes(categories => [...categories, newCategoryRecipe])
-      })
-  }
+  //   fetch('/recipesbycategory', {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "Accept": "application/json"
+  //     },
+  //     body: JSON.stringify(postCategoryFormData)
+  //   })
+  //   .then(response => response.json())
+  //   .then(newCategoryRecipe => {
+  //     console.log(newCategoryRecipe)
+  //       setRecipes(categories => [...categories, newCategoryRecipe])
+  //     })
+  // }
 
-  function updatePostCategoryFormData(event){
-    setPostCategoryFormData({...postCategoryFormData, [event.target.name]: event.target.value})
-  }
+  // function updatePostCategoryFormData(event){
+  //   setPostCategoryFormData({...postCategoryFormData, [event.target.name]: event.target.value})
+  // }
 
   function updateRecipe(event){
     event.preventDefault()
-    fetch(`/recipes/${idToUpdate}`, {
+    fetch(`/recipes/${patchFormData.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -156,18 +177,18 @@ const filterRecipe = recipes.filter(recipe => {
           <About />
         </Route>
         <Route exact path = "/recipesbycategory">
-          <CategoryList categories = {categories} />
-          {/* <RecipeList recipes={recipes} /> */}
+          <CategoryList categories = {categories} recipes = {recipes}/>
+          {/* <RecipeList recipes = {filterRecipe}/> */}
         </Route>
         <Route exact path = "/search">
           <Search searchByRecipe = {searchByRecipe} searchRecipe = {searchRecipe}/> 
           <RecipeList recipes = {filterRecipe}/>
         </Route>
         <Route path="/add_recipe">
-          <NewRecipeForm addCategoryRecipe ={addCategoryRecipe} updatePostCategoryFormData={updatePostCategoryFormData} addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories} searchByRecipe = {searchByRecipe}/>
+          <NewRecipeForm addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories} searchByRecipe = {searchByRecipe}/>
         </Route>
         <Route path="/update_recipe">
-          <UpdateRecipeForm updateRecipe={updateRecipe} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} recipes={filterRecipe} categories = {categories}/>
+          <UpdateRecipeForm updateRecipe={updateRecipe} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} recipes={recipes} categories = {categories}/>
         </Route>
       </Switch>
     </div>

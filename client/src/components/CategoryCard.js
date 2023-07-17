@@ -1,16 +1,25 @@
-function CategoryCard({category}) {
+import {useState} from 'react'
+import RecipeCard from './RecipeCard'
+
+
+function CategoryCard({category, recipes, clicked, setClicked}) {
+
+   
 
     function handleClick() {
-        console.log('clicked')
+        setClicked((clicked) = category.category)
+        console.log(clicked)
+
     }
 
-    return (
-        <div className = 'category-container'>
+
+        return (
+            <div className = 'category-container'>
             <div className = 'category' onClick = {handleClick}>
-            {category.category}
+                {category.category}
             </div>
-        </div>
-        )
+            </div>
+            )
 }
 
 

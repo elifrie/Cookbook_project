@@ -17,19 +17,19 @@ class Category(db.Model, SerializerMixin):
     category = db.Column(db.String, unique = True, nullable = False)
     # title = db.Column(db.String, unique = True, nullable = False)
 
-    category_recipes = db.relationship('Category_recipe', backref = 'category')
+    # category_recipes = db.relationship('Category_recipe', backref = 'category')
 
-    serialize_rules = ('-category_recipes',)
+    serialize_rules = ('-recipes',)
 
-class Category_recipe(db.Model, SerializerMixin):
-    __tablename__ = 'category_recipes'
+# class Category_recipe(db.Model, SerializerMixin):
+#     __tablename__ = 'category_recipes'
 
-    id = db.Column(db.Integer, primary_key = True)
+#     id = db.Column(db.Integer, primary_key = True)
 
-    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), nullable = False)
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable = False)
+#     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'))
+#     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable = False)
 
-    serialize_rules = ('-categories', '-recipes',)
+#     serialize_rules = ('-categories', '-recipes',)
 
 class Recipe(db.Model, SerializerMixin):
     __tablename__ = 'recipes'
@@ -37,6 +37,7 @@ class Recipe(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key = True)
 
     title = db.Column(db.String, nullable = False)
+    category = db.Column(db.String, nullable = False, default = 'Appetizers')
     picture = db.Column(db.String)
     ingredients = db.Column(db.String)
     preparation = db.Column(db.String)
@@ -45,9 +46,9 @@ class Recipe(db.Model, SerializerMixin):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    category_recipes = db.relationship('Category_recipe', backref = 'recipe')
+    # category_recipes = db.relationship('Category_recipe', backref = 'recipe')
 
-    serialize_rules = ('-users', '-category_recipes',)
+    serialize_rules = ('-users',)
 
 
 class User(db.Model, SerializerMixin):

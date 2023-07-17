@@ -4,6 +4,7 @@ function UpdateRecipeForm({updateRecipe, setIdToUpdate, updatePatchFormData, rec
 
     const [updateFormSubmitted, setUpdateFormSubmitted] = useState(false)
 
+
     return (
         <div className="recipe-update-form">
             <h2>Need to update a recipe?</h2>
@@ -13,14 +14,19 @@ function UpdateRecipeForm({updateRecipe, setIdToUpdate, updatePatchFormData, rec
                 setUpdateFormSubmitted(updateFormSubmitted => !updateFormSubmitted)
             }}>
                 <div className= 'recipe-form-container'>
-                    <input onChange={updatePatchFormData} type="text" className = "title_new_recipe" name="title" placeholder="Recipe name" required/>
-                    <select onChange={updatePatchFormData} type="text" className = "category_new_recipe" name="category" placeholder="Category" required>
-                        {categories.map(category => {
-                            return <option key = {category.id} value = {category.id}>{category.category}</option>
+                    <select onChange={updatePatchFormData} type="text" placeholder="Search for a recipe" required>
+                        {recipes.map(recipe => {
+                            return <option key = {recipe.id} value = {recipe.id}>{recipe.title}</option>
                         })}
                     </select>
-                    <textarea onChange={updatePatchFormData} type="text" name="ingredients" className = "ingredients_new_recipe" placeholder="Ingredients" required/>
-                    <textarea onChange={updatePatchFormData} type="text" name="preparation" className = "preparation_new_recipe"placeholder="Preparation" required/>                
+                    <input onChange = {updatePatchFormData} className = "title_new_recipe" placeholder= "Recipe Title" name ='title' type="text"/>
+                    <select onChange={updatePatchFormData} type="text" className = "category_new_recipe" name="category" placeholder="Category" >
+                        {categories.map(category => {
+                            return <option key = {category.id} value = {category.category}>{category.category}</option>
+                        })}
+                    </select>
+                    <textarea onChange={updatePatchFormData} type="text" name="ingredients" className = "ingredients_new_recipe" placeholder="Ingredients" />
+                    <textarea onChange={updatePatchFormData} type="text" name="preparation" className = "preparation_new_recipe"placeholder="Preparation" />                
                     <textarea onChange={updatePatchFormData} type="text" name="tips" className = "tips_new_recipe" placeholder="Tips" />
                     <input className = "update-recipe" type="submit" value= "Update Recipe"/>
                 </div>

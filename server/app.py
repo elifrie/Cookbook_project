@@ -9,7 +9,7 @@ from flask_restful import Api, Resource
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from datetime import datetime
-from models import db, Recipe, User, Category_recipe, Category
+from models import db, Recipe, User, Category
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hotels.db'
@@ -60,9 +60,12 @@ class Recipes(Resource):
     
     def post(self):
         data = request.get_json()
+        # category = Category.query.filter_by(category = categoryname).first()
+        # categoryname = data['categoryname']
         new_recipe = Recipe(
             user_id = 1,
             title = data['title'],
+            category = data['category'],
             # picture = data['picture'],
             ingredients = data['ingredients'],
             preparation = data['preparation'],
@@ -84,12 +87,19 @@ class RecipeById(Resource):
     
     def patch(self, id):
         recipe = Recipe.query.filter_by(id = id).first()
-        data = request.get_json()
-        for attr in data:
-            setattr(recipe, attr, data[attr])
-        db.session.commit()
-        response_body = recipe.to_dict()
-        return make_response(jsonify(response_body), 202)
+        if recipe:
+            data = request.get_json()
+            for attr in data:
+                setattr(recipe, attr, data[attr])
+            db.session.commit()
+            response_body = recipe.to_dict()
+            return make_response(jsonify(response_body), 202)
+        else:
+            response_body = {
+                'error': 'Recipe not found!'
+            } 
+            return make_response(jsonify(response_body), 404)
+
     
     def delete(self, id):
         recipe = Recipe.query.filter_by(id = id).first()
@@ -115,26 +125,26 @@ class CategoryById(Resource):
     
 api.add_resource(CategoryById, '/categories/<int:id>')
 
-class RecipesByCategory(Resource):
-    def get(self):
-        category_recipes = Category_recipe.query.all()
-        response_body = [category_recipe.to_dict() for category_recipe in category_recipes]
-        return make_response(jsonify(response_body), 200)
+# class RecipesByCategory(Resource):
+#     def get(self):
+#         category_recipes = Category_recipe.query.all()
+#         response_body = [category_recipe.to_dict() for category_recipe in category_recipes]
+#         return make_response(jsonify(response_body), 200)
 
-    def post(self):
-        # recipe = Recipe.query.filter_by(id = request.json.get('recipe_id')).first()
-        category = Category.query.filter_by(id = request.json.get('category_id')).first()
+#     def post(self):
+#         recipe = Recipe.query.filter_by(id = request.json.get('recipe_id')).first()
+#         category = Category.query.filter_by(id = request.json.get('category_id')).first()
         
-        new_recipe_category = Category_recipe(
-            # recipe_id = recipe.id,
-            category_id = category.id
-        )
-        db.session.add(new_recipe_category)
-        db.session.commit()
-        response_body = new_recipe_category.to_dict()
-        return make_response(jsonify(response_body), 201)
+#         new_recipe_category = Category_recipe(
+#             # recipe_id = recipe.id,
+#             category_id = category.id
+#         )
+#         db.session.add(new_recipe_category)
+#         db.session.commit()
+#         response_body = new_recipe_category.to_dict()
+#         return make_response(jsonify(response_body), 201)
     
-api.add_resource(RecipesByCategory, '/recipesbycategory')
+# api.add_resource(RecipesByCategory, '/recipesbycategory')
 
 if __name__ == '__main__':
     app.run(port=7555, debug=True)
