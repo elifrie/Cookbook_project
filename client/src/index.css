@@ -1,6 +1,5 @@
 :root {
   --green: rgb(39, 189, 39);
-  --orange: rgb(255, 165, 0);
 }
 
 * {
@@ -55,24 +54,6 @@ h2 {
   max-width: 1200px;
 }
 
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #ccc;
-}
-
-nav a {
-  font-size: 1rem;
-  display: inline-block;
-  background-color: #fff8e7;
-  border: 1px solid salmon;
-  margin: 1rem;
-  padding: 1rem;
-  text-decoration: none;
-  color: salmon;
-  cursor: pointer;
-}
 
 header h1 {
   font-size: 2.5em;
@@ -125,8 +106,6 @@ label {
 input {
   padding: 0.25rem;
   border: none;
-  font-family: inherit;
-  font-size: 1.2em;
   border-bottom: 2px solid gray;
   transition: all 0.2s;
   width: 100%;

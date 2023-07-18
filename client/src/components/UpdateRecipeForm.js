@@ -1,20 +1,39 @@
 import {useState} from 'react'
 
+let submitted = 1;
+
 function UpdateRecipeForm({updateRecipe, setIdToUpdate, updatePatchFormData, recipes, categories}){
 
     const [updateFormSubmitted, setUpdateFormSubmitted] = useState(false)
 
+    let previousLength = 0;
+
+    const handleInput = (event) => {
+        const bullet = "\u25A0";
+        const newLength = event.target.value.length;
+        const characterCode = event.target.value.substr(-1).charCodeAt(0);
+
+        if (newLength > previousLength) {
+            if (characterCode === 10) {
+                event.target.value = `${event.target.value}${bullet} `;
+            } else if (newLength === 1) {
+                event.target.value = `${bullet} ${event.target.value}`;
+            }
+        }
+
+    previousLength = newLength;
+}
 
     return (
         <div className="recipe-update-form">
-            <h2>Need to update a recipe?</h2>
+            <h2 className='header'>Need to update a recipe?</h2>
             {updateFormSubmitted ? <h1>Recipe Updated!</h1> :
             <form onSubmit={event => {
                     updateRecipe(event)
                 setUpdateFormSubmitted(updateFormSubmitted => !updateFormSubmitted)
             }}>
                 <div className= 'recipe-form-container'>
-                    <select onChange={updatePatchFormData} type="text" placeholder="Search for a recipe" required>
+                    <select className='dropdown' onChange={updatePatchFormData} type="text" placeholder="Search for a recipe" required>
                         {recipes.map(recipe => {
                             return <option key = {recipe.id} value = {recipe.id}>{recipe.title}</option>
                         })}
@@ -25,9 +44,9 @@ function UpdateRecipeForm({updateRecipe, setIdToUpdate, updatePatchFormData, rec
                             return <option key = {category.id} value = {category.category}>{category.category}</option>
                         })}
                     </select>
-                    <textarea onChange={updatePatchFormData} type="text" name="ingredients" className = "ingredients_new_recipe" placeholder="Ingredients" />
-                    <textarea onChange={updatePatchFormData} type="text" name="preparation" className = "preparation_new_recipe"placeholder="Preparation" />                
-                    <textarea onChange={updatePatchFormData} type="text" name="tips" className = "tips_new_recipe" placeholder="Tips" />
+                    <textarea onInput = {handleInput} onChange={updatePatchFormData} type="text" name="ingredients" className = "ingredients_new_recipe" placeholder="Ingredients" />
+                    <textarea onInput = {handleInput} onChange={updatePatchFormData} type="text" name="preparation" className = "preparation_new_recipe"placeholder="Preparation" />                
+                    <textarea onInput = {handleInput} onChange={updatePatchFormData} type="text" name="tips" className = "tips_new_recipe" placeholder="Tips" />
                     <input className = "update-recipe" type="submit" value= "Update Recipe"/>
                 </div>
             </form>}

@@ -169,28 +169,30 @@ const filterRecipe = recipes.filter(recipe => {
   }
 
   return (
-    <div className="app">
-      <NavBar/>
-      <Header />
-      <Switch>
-        <Route exact path="/">
-          <About />
-        </Route>
-        <Route exact path = "/recipesbycategory">
-          <CategoryList categories = {categories} recipes = {recipes}/>
-          {/* <RecipeList recipes = {filterRecipe}/> */}
-        </Route>
-        <Route exact path = "/search">
-          <Search searchByRecipe = {searchByRecipe} searchRecipe = {searchRecipe}/> 
-          <RecipeList recipes = {filterRecipe}/>
-        </Route>
-        <Route path="/add_recipe">
-          <NewRecipeForm addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories} searchByRecipe = {searchByRecipe}/>
-        </Route>
-        <Route path="/update_recipe">
-          <UpdateRecipeForm updateRecipe={updateRecipe} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} recipes={recipes} categories = {categories}/>
-        </Route>
-      </Switch>
+    <div className='background-image'>
+      <div className="app">
+        <NavBar/>
+        <Header />
+        <Switch>
+          <Route exact path="/">
+            <About />
+          </Route>
+          <Route exact path = "/recipesbycategory">
+            <CategoryList categories = {categories} recipes = {recipes}/>
+            {/* <RecipeList recipes = {filterRecipe}/> */}
+          </Route>
+          <Route exact path = "/search">
+            <Search searchByRecipe = {searchByRecipe} searchRecipe = {searchRecipe}/> 
+            <RecipeList recipes = {filterRecipe}/>
+          </Route>
+          <Route path="/add_recipe">
+            <NewRecipeForm addRecipe ={addRecipe} updatePostFormData={updatePostFormData} categories = {categories} searchByRecipe = {searchByRecipe}/>
+          </Route>
+          <Route path="/update_recipe">
+            <UpdateRecipeForm updateRecipe={updateRecipe} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} recipes={recipes} categories = {categories}/>
+          </Route>
+        </Switch>
+      </div>
     </div>
   );
 }

@@ -10,11 +10,12 @@ function RecipeCard({recipe}){
     }
 
     return (
-        <div className="recipe">
-            <h1 onClick = {handleClick} className='card-title'> {recipe.title} ({recipe.category})</h1> 
+        <div >
+            <h1 onClick = {handleClick} className='card-title'> {recipe.title} </h1> 
                 {readMore ?
                 <div className='recipe-body'> 
                     <p>Ingredients:</p> 
+                    <br></br> 
                     <p className='recipe-ingredients'>{recipe.ingredients}</p>
                         <br></br> 
                         <br></br>
