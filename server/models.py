@@ -67,6 +67,12 @@ class User(db.Model, SerializerMixin):
 
     recipes = db.relationship('Recipe', backref = 'user')
 
+    @validates('username', 'password')
+    def validate_user(self, key, value):
+        if not value:
+            raise ValueError('Please provide a username and password for your account')
+        return value
+
     serialize_rules = ('-recipes',)
 
 # Models go here!
