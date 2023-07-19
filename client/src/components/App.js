@@ -11,6 +11,9 @@ import About from './About'
 import CategoryCard from './CategoryCard.js'
 import CategoryList from './CategoryList'
 import Search from './Search'
+import Login from './Login'
+import Signup from './Signup'
+import UserDetails from './UserDetails'
 
 function App() {
 
@@ -22,6 +25,8 @@ function App() {
   const [patchFormData, setPatchFormData] = useState({})
   const [searchRecipe, setRecipeSearch] = useState('')
   const [searchCategory, setCategorySearch] = useState('')
+  const [currentUser, setCurrentUser] = useState(null)
+
 
   console.log(patchFormData)
 
@@ -73,6 +78,55 @@ const filterRecipe = recipes.filter(recipe => {
     }
       )
   }, [])
+
+  useEffect(() => {
+    fetch('/current_session')
+    .then(res => {
+      if (res.ok) {
+        res.json()
+        .then(user => setCurrentUser(user))
+      }
+    })
+  }, [])
+
+  function attemptLogin(userInfo) {
+    fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accepts': 'application/json'
+      },
+      body: JSON.stringify(userInfo)
+    })
+    .then(res => {
+      if (res.ok) {
+        res.json()
+        .then(user => setCurrentUser(user))
+      }
+    })
+  }
+
+  function attemptSignup(userInfo) {
+    fetch('/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accepts': 'application/json'
+      },
+      body: JSON.stringify(userInfo)
+    })
+    .then(res => {
+      if (res.ok) {
+        res.json()
+        .then(user => setCurrentUser(user))
+      }
+    })
+  }
+
+  function logout() {
+    setCurrentUser(null)
+    fetch('/logout', { method: 'DELETE' })
+  }
 
   // useEffect(() => {
   //   if(hotels.length > 0 && hotels[0].id){
@@ -190,6 +244,13 @@ const filterRecipe = recipes.filter(recipe => {
           </Route>
           <Route path="/update_recipe">
             <UpdateRecipeForm updateRecipe={updateRecipe} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} recipes={recipes} categories = {categories}/>
+          </Route>
+          <Route path='/signup'>
+            { !currentUser ? <Signup attemptSignup={attemptSignup} /> : null }
+          </Route>
+          <Route path='/login'>
+            { !currentUser ? <Login attemptLogin={attemptLogin} /> : null }
+            { currentUser ? <UserDetails currentUser={currentUser} logout={logout} /> : null }
           </Route>
         </Switch>
       </div>

@@ -31,8 +31,10 @@
 /* Styles for the navigation links (nav) */
 .nav-wrapper {
   max-width: 1170px; /* Set the maximum width for the navigation bar */
-  margin: 0 auto; /* Center the navigation bar horizontally */
+  margin: 0 ; /* Center the navigation bar horizontally */
   padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .nav-container {

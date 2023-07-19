@@ -46,6 +46,12 @@ class Recipe(db.Model, SerializerMixin):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+    @validates('title', 'category')
+    def validate_recipe(self, key, value):
+        if not value:
+            raise ValueError('Please include a title and category for your recipe')
+        return value
+
     # category_recipes = db.relationship('Category_recipe', backref = 'recipe')
 
     serialize_rules = ('-users',)

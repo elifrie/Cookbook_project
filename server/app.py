@@ -12,6 +12,7 @@ from datetime import datetime
 from models import db, Recipe, User, Category
 
 app = Flask(__name__)
+app.secret_key = b'maylover'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hotels.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
@@ -20,9 +21,49 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
+bcrypt = Bcrypt(app)
+
+def get_current_user():
+    return User.query.where( User.id == session.get("user_id") ).first()
+
+def logged_in():
+    return bool( get_current_user() )
+
 # CORS(app)
 
 api = Api(app)
+
+@app.post('/users')
+def create_user():
+    json = request.json
+    pw_hash = bcrypt.generate_password_hash(json['password']).decode('utf-8')
+    new_user = User(username=json['username'], password=pw_hash)
+    db.session.add(new_user)
+    db.session.commit()
+    session['user_id'] = new_user.id
+    return new_user.to_dict(), 201
+
+@app.post('/login')
+def login():
+    json = request.json
+    user = User.query.where(User.username == json["username"]).first()
+    if user and bcrypt.check_password_hash(user.password, json['password']):
+        session['user_id'] = user.id
+        return user.to_dict(), 201
+    else:
+        return {'message': 'Invalid username or password'}, 401
+
+@app.get('/current_session')
+def check_session():
+    if logged_in():
+        return get_current_user().to_dict(), 200
+    else:
+        return {}, 401
+
+@app.delete('/logout')
+def logout():
+    session['user_id'] = None
+    return {}, 204
 
 class Users(Resource):
 
@@ -50,6 +91,21 @@ class Users(Resource):
 
 
 api.add_resource(Users, '/users')
+
+class UserById(Resource):
+
+    def get(self,id):
+        user = User.query.filter_by(id = id).first()
+        response_body = user.to_dict()
+        return make_response(jsonify(response_body), 200)
+    
+    def delete(self,id):
+        user = User.query.filter_by(id = id).first()
+        db.session.delete(user)
+        db.session.commit()
+        return make_response(jsonify({'message': 'User deleted!'}), 204)
+    
+api.add_resource(UserById, '/users/<int:id>')
 
 class Recipes(Resource):
 

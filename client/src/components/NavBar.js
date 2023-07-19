@@ -10,6 +10,9 @@ function NavBar(){
                     <NavLink className = 'custom-button' to="/search">Search Recipe</NavLink>
                     <NavLink className = 'custom-button' to="/add_recipe">Add Recipe</NavLink>
                     <NavLink className = 'custom-button' to="/update_recipe">Update Recipe</NavLink>
+                    <NavLink className = 'custom-button' to="/signup">Signup</NavLink>
+                    <NavLink className = 'custom-button' to="/login">Login</NavLink>
+
                 </div>
             </div>
         </nav>
