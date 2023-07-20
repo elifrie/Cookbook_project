@@ -28,6 +28,14 @@
   box-shadow: none; /* Remove the box shadow to eliminate the dark gray shadowing */
 }
 
+.slideshow img {
+  max-width: 100%;
+  max-height: 700px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease-in-out;
+}
+
 /* Styles for the navigation links (nav) */
 .nav-wrapper {
   max-width: 1170px; /* Set the maximum width for the navigation bar */
